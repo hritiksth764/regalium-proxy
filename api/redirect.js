@@ -14,9 +14,27 @@ export default function handler(req, res) {
   const userAgent = req.headers["user-agent"].toLowerCase();
   const isMobile = /android|iphone/.test(userAgent);
 
-  if (isMobile) {
-    proxyRequest("https://regalium-mobile.vercel.app" + req.url, req, res);
+  if (req.method === "POST" && req.url === "/submit") {
+    // Handle form submission logic here, for example saving the data or sending it to a backend
+    // ...
+
+    // After handling the form submission, redirect to the appropriate home.html
+    if (isMobile) {
+      res.writeHead(302, {
+        Location: "https://regalium-mobile.vercel.app/home.html",
+      });
+    } else {
+      res.writeHead(302, {
+        Location: "https://regalium-desktop.vercel.app/home.html",
+      });
+    }
+    res.end();
   } else {
-    proxyRequest("https://regalium-desktop.vercel.app" + req.url, req, res);
+    // Proxy the request to the appropriate site
+    if (isMobile) {
+      proxyRequest("https://regalium-mobile.vercel.app" + req.url, req, res);
+    } else {
+      proxyRequest("https://regalium-desktop.vercel.app" + req.url, req, res);
+    }
   }
 }
